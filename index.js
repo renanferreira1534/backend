@@ -1,0 +1,164 @@
+//importar a biblioteca do node modules chamada "EXPRESS" para criar nosso servidor de backend
+const express = require("express");
+
+//importar a biblioteca do MYSQL
+const mysql = require("mysql2");
+
+//importar a biblioteca do cors
+const cors = require("cors");
+
+//importar a biblioteca do bcrypt
+//para a criptografia de senha
+const bcrypt = require("bcrypt");
+
+
+//estabelecer a conexão com o banco de dados mysql
+const con = mysql.createConnection({
+    host:"127.0.0.1",
+    port:3306   ,
+    user:"root",
+    password:"",
+    database:"mydb"
+});
+
+//carregar e instanciar o EXPRESS para utilizar as rotas:
+//GET -> Para obter dados do banco de dados -> R
+//POST -> Para enviar dados ao servidor e gravar dados no banco de dados -> C
+//PUT -> Para atualizar os dados no banco -> U
+//DELETE -> Para apagar dados em banco -> D
+const app = express();
+
+//carregar a função que manipula dados em formato JSON, ou seja, permite ler, gravar, atualizar,
+//deletar, enviar e receber dados em formato JSON
+app.use(express.json());
+
+//ativar o modolo do cors
+app.use(cors());
+
+//primeira rota para listar os dados do banco
+app.get("/clientes/listar",(req,res)=>{          //req=requisitar  res=responder
+    //usar o comando Select para listar todos os clientes
+    con.query("Select * from cliente",(error,result)=>{
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar listar os dados ${error}`})
+        }
+        res.status(200).send({msg:result});     //usar crase, pois aspas dá erro
+    })
+});
+
+//segunda rota para receber os dados enviados pelo usuário
+app.post("/cadastrar",(req,res)=>{
+
+
+    let sh = req.body.senha;
+    bcrypt.hash(sh,10,(erro,criptografada)=>{
+        if(erro){
+            return res.status(500).send({msg:`erro ao `})
+        }
+        //devolver a senha para o body
+        //porém com a devida criptografia
+        req.body.senha = criptografada;
+        con.query("insert into cliente set ?", req.body,(error, result)=>{
+        if (error) {
+            return res.status(500).send({erro:`Erro ao tentar cadastrar ${error}`})
+        }
+        res.status(201).send({msg:`Cliente cadastrado`,payload:result});
+    })
+})
+
+});
+
+//terceira rota para receber os dados e atualizar
+app.put("/atualizar/:id",(req,res)=>{
+
+    con.query("update cliente set ? where id=?",[req.body, req.params.id],(error,result)=>{ //[] porque são 2 parâmetros
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar atualizar ${error}`})
+        }
+        res.status(200).send({msg:`Dados atualizados`,payload:result});
+    });
+
+});
+
+//quarta rota para receber um id e apagar um dado
+app.delete("/apagar/:id",(req,res)=>{
+
+    con.query("delete from cliente where id=?",req.params.id,(error,result)=>{
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar deletar ${error}`})
+        }
+        res.status(200).send({msg:`Dados apagados`,payload:result});
+    });
+});
+
+app.post("/login",(req,res)=>{
+    con.query("SELECT id,email,usuario,senha FROM clente WHERE nome usuario=?",req.body.usuario,(erro,result)=>{
+        if(erro){
+            return res.status(400).send({msg:"Usuario ou senha inexistente"});
+        }
+        bcrypt.compare(req.body.senha,result[0].senha,result[0]);
+
+            return res.status (400).send({msg:escrevaoerro})
+    })
+});
+
+
+// produtos -------------------------------
+
+app.get("/produto/listar",(req,res)=>{          //req=requisitar  res=responder
+    //usar o comando Select para listar todos os clientes
+    con.query("Select * from produto",(error,result)=>{
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar encontrar o produto ${error}`})
+        }
+        res.status(200).send({msg:result});     //usar crase, pois aspas dá erro
+    })
+});
+
+//segunda rota para receber os dados enviados pelo usuário
+app.post("/produto/cadastrar",(req,res)=>{
+    
+        con.query("insert into produto set ?", req.body,(error, result)=>{
+        if (error) {
+            return res.status(500).send({erro:`Erro ao tentar cadastrar ${error}`})
+        }
+        res.status(201).send({msg:`Produto cadastrado`,payload:result});
+    })
+
+});
+
+//terceira rota para receber os dados e atualizar
+app.put("/produto/atualizar/:id",(req,res)=>{
+
+    con.query("update produto set ? where id=?",[req.body, req.params.id],(error,result)=>{ //[] porque são 2 parâmetros
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar atualizar ${error}`})
+        }
+        res.status(200).send({msg:`Dados atualizados`,payload:result});
+    });
+
+});
+
+//quarta rota para receber um id e apagar um dado
+app.delete("/produto/apagar/:id",(req,res)=>{
+
+    con.query("delete from produto where id=?",req.params.id,(error,result)=>{
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar deletar ${error}`})
+        }
+        res.status(200).send({msg:`Dados apagados`,payload:result});
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+//determinando a porta de comunicação
+app.listen(3000,()=>console.log("Servidor online http://127.0.0.1:3000"));
