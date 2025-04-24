@@ -154,9 +154,9 @@ app.delete("/produto/apagar/:id",(req,res)=>{
 
 // comprar -------------------------------
 
-app.get("/comprar/listar",(req,res)=>{          //req=requisitar  res=responder
+app.get("/compra/listar",(req,res)=>{          //req=requisitar  res=responder
     //usar o comando Select para listar todos os clientes
-    con.query("Select * from comprar",(error,result)=>{
+    con.query("Select * from compra",(error,result)=>{
         if(error){
             return res.status(500).send({erro:`Erro ao tentar comprar o produto ${error}`})
         }
@@ -165,9 +165,9 @@ app.get("/comprar/listar",(req,res)=>{          //req=requisitar  res=responder
 });
 
 //segunda rota para receber os dados enviados pelo usuário
-app.post("/comprar/cadastrar",(req,res)=>{
+app.post("/compra/cadastrar",(req,res)=>{
     
-        con.query("insert into comprar set ?", req.body,(error, result)=>{
+        con.query("insert into compra set ?", req.body,(error, result)=>{
         if (error) {
             return res.status(500).send({erro:`Erro ao tentar cadastrar ${error}`})
         }
@@ -189,9 +189,9 @@ app.put("/compra/atualizar/:id",(req,res)=>{
 });
 
 //quarta rota para receber um id e apagar um dado
-app.delete("/comprar/apagar/:id",(req,res)=>{
+app.delete("/compra/apagar/:id",(req,res)=>{
 
-    con.query("delete from comprar where id=?",req.params.id,(error,result)=>{
+    con.query("delete from compra where id=?",req.params.id,(error,result)=>{
         if(error){
             return res.status(500).send({erro:`Erro ao tentar deletar ${error}`})
         }
