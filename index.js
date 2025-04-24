@@ -18,7 +18,7 @@ const con = mysql.createConnection({
     port:3306   ,
     user:"root",
     password:"",
-    database:"mydb"
+    database:"mrk"
 });
 
 //carregar e instanciar o EXPRESS para utilizar as rotas:
