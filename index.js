@@ -152,10 +152,52 @@ app.delete("/produto/apagar/:id",(req,res)=>{
 
 
 
+// comprar -------------------------------
 
+app.get("/comprar/listar",(req,res)=>{          //req=requisitar  res=responder
+    //usar o comando Select para listar todos os clientes
+    con.query("Select * from comprar",(error,result)=>{
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar comprar o produto ${error}`})
+        }
+        res.status(200).send({msg:result});     //usar crase, pois aspas dá erro
+    })
+});
 
+//segunda rota para receber os dados enviados pelo usuário
+app.post("/comprar/cadastrar",(req,res)=>{
+    
+        con.query("insert into comprar set ?", req.body,(error, result)=>{
+        if (error) {
+            return res.status(500).send({erro:`Erro ao tentar cadastrar ${error}`})
+        }
+        res.status(201).send({msg:`compra cadastrado`,payload:result});
+    })
 
+});
 
+//terceira rota para receber os dados e atualizar
+app.put("/compra/atualizar/:id",(req,res)=>{
+
+    con.query("update compra set ? where id=?",[req.body, req.params.id],(error,result)=>{ //[] porque são 2 parâmetros
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar atualizar ${error}`})
+        }
+        res.status(200).send({msg:`Dados atualizados`,payload:result});
+    });
+
+});
+
+//quarta rota para receber um id e apagar um dado
+app.delete("/comprar/apagar/:id",(req,res)=>{
+
+    con.query("delete from comprar where id=?",req.params.id,(error,result)=>{
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar deletar ${error}`})
+        }
+        res.status(200).send({msg:`Dados apagados`,payload:result});
+    });
+});
 
 
 
