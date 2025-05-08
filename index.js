@@ -115,6 +115,30 @@ app.get("/produto/listar",(req,res)=>{          //req=requisitar  res=responder
     })
 });
 
+
+app.get("/produto/pesquisar/:nome",(req,res)=>{          //req=requisitar  res=responder
+    //usar o comando Select para listar todos os clientes
+    let par = `%${req.params.nome}%`
+    con.query(`Select * from produto where nome like ?`,par,(error,result)=>{
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar encontrar o produto ${error}`})
+        }
+        res.status(200).send({msg:result});     //usar crase, pois aspas dá erro
+    })
+});
+
+
+app.get("/produto/detalhes/:id",(req,res)=>{          //req=requisitar  res=responder
+    //usar o comando Select para listar todos os clientes
+    
+    con.query(`Select * from produto where id_produto = ?`,req.params.id,(error,result)=>{
+        if(error){
+            return res.status(500).send({erro:`Erro ao tentar encontrar o produto ${error}`})
+        }
+        res.status(200).send({msg:result});     //usar crase, pois aspas dá erro
+    })
+});
+
 //segunda rota para receber os dados enviados pelo usuário
 app.post("/produto/cadastrar",(req,res)=>{
     
