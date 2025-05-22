@@ -32,6 +32,9 @@ const app = express();
 //deletar, enviar e receber dados em formato JSON
 app.use(express.json());
 
+app.use(express.urlencoded({ extended: true }));
+
+
 //ativar o modolo do cors
 app.use(cors());
 
@@ -92,7 +95,7 @@ app.delete("/apagar/:id",(req,res)=>{
 });
 
 app.post("/login",(req,res)=>{
-    con.query("SELECT id,email,usuario,senha FROM clente WHERE nome usuario=?",req.body.usuario,(erro,result)=>{
+    con.query("SELECT id,email,usuario,senha FROM cliente WHERE nome usuario=?",req.body.usuario,(erro,result)=>{
         if(erro){
             return res.status(400).send({msg:"Usuario ou senha inexistente"});
         }
