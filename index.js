@@ -131,7 +131,7 @@ app.get("/produto/pesquisar/:nome",(req,res)=>{          //req=requisitar  res=r
 app.get("/produto/detalhes/:id",(req,res)=>{          //req=requisitar  res=responder
     //usar o comando Select para listar todos os clientes
     
-    con.query(`Select * from produto where id_produto = ?`,req.params.id,(error,result)=>{
+    con.query(`Select * from produto where id = ?`,req.params.id,(error,result)=>{
         if(error){
             return res.status(500).send({erro:`Erro ao tentar encontrar o produto ${error}`})
         }
@@ -141,6 +141,7 @@ app.get("/produto/detalhes/:id",(req,res)=>{          //req=requisitar  res=resp
 
 //segunda rota para receber os dados enviados pelo usuário
 app.post("/produto/cadastrar",(req,res)=>{
+    console.log(req.body)
     
         con.query("insert into produto set ?", req.body,(error, result)=>{
         if (error) {
