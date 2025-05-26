@@ -94,16 +94,37 @@ app.delete("/apagar/:id",(req,res)=>{
     });
 });
 
-app.post("/login",(req,res)=>{
-    con.query("SELECT id,email,usuario,senha FROM cliente WHERE nome usuario=?",req.body.usuario,(erro,result)=>{
-        if(erro){
-            return res.status(400).send({msg:"Usuario ou senha inexistente"});
+app.post("/login", (req, res) => {
+    const { usuario, senha } = req.body;
+    console.log(usuario)
+    const sql = "SELECT id_cliente, email, usuario, senha FROM cliente WHERE usuario = ?";
+    con.query(sql, usuario, (err, results) => {
+        if (err) {
+            console.log("Erro no SELECT:", err);
+            return res.status(500).json({ msg: "Erro no servidor." });
         }
-        bcrypt.compare(req.body.senha,result[0].senha,result[0]);
 
-            return res.status (400).send({msg:escrevaoerro})
-    })
+        if (results.length === 0) {
+            return res.status(401).json({ msg: "Usuário ou senha inválidos.usuario" });
+        }
+
+        const user = results[0];
+        console.log(senha)
+        bcrypt.compare(senha, user.senha, (err, same) => {
+            if (err) {
+                console.log("Erro no bcrypt.compare:", err);
+                return res.status(500).json({ msg: "Erro ao verificar a senha." });
+            }
+
+            if (!same) {
+                return res.status(401).json({ msg: "Usuário ou senha inválidos.senha" });
+            }
+
+            return res.status(200).json({ msg: "Login realizado com sucesso!", usuario: user.usuario });
+        });
+    });
 });
+
 
 
 // produtos -------------------------------
