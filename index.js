@@ -32,6 +32,9 @@ const app = express();
 //deletar, enviar e receber dados em formato JSON
 app.use(express.json());
 
+app.use(express.urlencoded({ extended: true }));
+
+
 //ativar o modolo do cors
 app.use(cors());
 
@@ -92,7 +95,7 @@ app.delete("/apagar/:id",(req,res)=>{
 });
 
 app.post("/login",(req,res)=>{
-    con.query("SELECT id,email,usuario,senha FROM clente WHERE nome usuario=?",req.body.usuario,(erro,result)=>{
+    con.query("SELECT id,email,usuario,senha FROM cliente WHERE nome usuario=?",req.body.usuario,(erro,result)=>{
         if(erro){
             return res.status(400).send({msg:"Usuario ou senha inexistente"});
         }
@@ -105,41 +108,41 @@ app.post("/login",(req,res)=>{
 
 // produtos -------------------------------
 
-app.get("/produto/listar",(req,res)=>{          //req=requisitar  res=responder
+app.get("/produto/listar",(req,res)=>{          
     //usar o comando Select para listar todos os clientes
     con.query("Select * from produto",(error,result)=>{
         if(error){
             return res.status(500).send({erro:`Erro ao tentar encontrar o produto ${error}`})
         }
-        res.status(200).send({msg:result});     //usar crase, pois aspas dá erro
+        res.status(200).send({msg:result});     
     })
 });
 
 
-app.get("/produto/pesquisar/:nome",(req,res)=>{          //req=requisitar  res=responder
+app.get("/produto/pesquisar/:nome",(req,res)=>{          
     //usar o comando Select para listar todos os clientes
     let par = `%${req.params.nome}%`
     con.query(`Select * from produto where nome like ?`,par,(error,result)=>{
         if(error){
             return res.status(500).send({erro:`Erro ao tentar encontrar o produto ${error}`})
         }
-        res.status(200).send({msg:result});     //usar crase, pois aspas dá erro
+        res.status(200).send({msg:result});    
     })
 });
 
 
-app.get("/produto/detalhes/:id",(req,res)=>{          //req=requisitar  res=responder
-    //usar o comando Select para listar todos os clientes
+app.get("/produto/detalhes/:id",(req,res)=>{          
+    //usar o comando Select para listar todos os produtos
     
     con.query(`Select * from produto where id = ?`,req.params.id,(error,result)=>{
         if(error){
             return res.status(500).send({erro:`Erro ao tentar encontrar o produto ${error}`})
         }
-        res.status(200).send({msg:result});     //usar crase, pois aspas dá erro
+        res.status(200).send({msg:result});     
     })
 });
 
-//segunda rota para receber os dados enviados pelo usuário
+//segunda rota de cadastro de produto
 app.post("/produto/cadastrar",(req,res)=>{
     console.log(req.body)
     
@@ -152,7 +155,7 @@ app.post("/produto/cadastrar",(req,res)=>{
 
 });
 
-//terceira rota para receber os dados e atualizar
+//terceira rota para atualizar produto
 app.put("/produto/atualizar/:id",(req,res)=>{
 
     con.query("update produto set ? where id=?",[req.body, req.params.id],(error,result)=>{ //[] porque são 2 parâmetros
@@ -164,7 +167,7 @@ app.put("/produto/atualizar/:id",(req,res)=>{
 
 });
 
-//quarta rota para receber um id e apagar um dado
+//quarta rota para pegar id e apagar um dado
 app.delete("/produto/apagar/:id",(req,res)=>{
 
     con.query("delete from produto where id=?",req.params.id,(error,result)=>{
@@ -177,19 +180,18 @@ app.delete("/produto/apagar/:id",(req,res)=>{
 
 
 
-// comprar -------------------------------
+// ---------------- comprar -------------------------------
 
-app.get("/compra/listar",(req,res)=>{          //req=requisitar  res=responder
-    //usar o comando Select para listar todos os clientes
+app.get("/compra/listar",(req,res)=>{         
     con.query("Select * from compra",(error,result)=>{
         if(error){
             return res.status(500).send({erro:`Erro ao tentar comprar o produto ${error}`})
         }
-        res.status(200).send({msg:result});     //usar crase, pois aspas dá erro
+        res.status(200).send({msg:result});     
     })
 });
 
-//segunda rota para receber os dados enviados pelo usuário
+//segunda rota para cadastro da compra 
 app.post("/compra/cadastrar",(req,res)=>{
     
         con.query("insert into compra set ?", req.body,(error, result)=>{
@@ -201,7 +203,7 @@ app.post("/compra/cadastrar",(req,res)=>{
 
 });
 
-//terceira rota para receber os dados e atualizar
+//terceira rota para atualizar compra 
 app.put("/compra/atualizar/:id",(req,res)=>{
 
     con.query("update compra set ? where id=?",[req.body, req.params.id],(error,result)=>{ //[] porque são 2 parâmetros
@@ -213,7 +215,7 @@ app.put("/compra/atualizar/:id",(req,res)=>{
 
 });
 
-//quarta rota para receber um id e apagar um dado
+//quarta rota para receber um id e apagar compra 
 app.delete("/compra/apagar/:id",(req,res)=>{
 
     con.query("delete from compra where id=?",req.params.id,(error,result)=>{
@@ -224,6 +226,27 @@ app.delete("/compra/apagar/:id",(req,res)=>{
     });
 });
 
+
+// ------------------------------- PAGAMENTO -------------------------------
+
+app.post("/compra/registrar", (req, res) => {
+    const dados = req.body;
+
+
+    // Validar forma de pagamento
+    const formasValidas = ["pix", "credito"];
+    if (!formasValidas.includes(dados.formaPG)) {
+        return res.status(400).send({ erro: "Forma de pagamento inválida. Use 'pix' ou 'credito'." });
+    }
+
+    // Registrar o pagamento
+    con.query("INSERT INTO compra SET ?", dados, (error, result) => {
+        if (error) {
+            return res.status(500).send({ erro: `Erro ao registrar compra: ${error}` });
+        }
+        res.status(201).send({ msg: "compra registrado com sucesso.", payload: result });
+    });
+});
 
 
 
