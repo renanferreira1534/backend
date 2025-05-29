@@ -234,10 +234,10 @@ app.post("/compra/registrar", (req, res) => {
 
 
     // Validar forma de pagamento
-    const formasValidas = ["pix", "credito"];
-    if (!formasValidas.includes(dados.formaPG)) {
-        return res.status(400).send({ erro: "Forma de pagamento inválida. Use 'pix' ou 'credito'." });
-    }
+    const formasValidas = [1, 2];
+    // if (!formasValidas.includes(dados.formaPG)) {
+    //     return res.status(400).send({ erro: "Forma de pagamento inválida. Use 'pix' ou 'credito'." });
+    // }
 
     // Registrar o pagamento
     con.query("INSERT INTO compra SET ?", dados, (error, result) => {
