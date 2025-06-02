@@ -125,6 +125,35 @@ app.post("/login", (req, res) => {
     });
 });
 
+app.post("/recuperar-senha", (req, res) => {
+    const { email } = req.body;
+
+    const sql = "SELECT * FROM cliente WHERE email = ?";
+    con.query(sql, [email], (err, results) => {
+        if (err) return res.status(500).json({ msg: "Erro no servidor." });
+
+        if (results.length === 0) {
+            return res.status(404).json({ msg: "E-mail não encontrado." });
+        }
+
+        // Criar nova senha aleatória
+        const novaSenha = Math.random().toString(36).slice(-8);
+
+        // Criptografar
+        bcrypt.hash(novaSenha, 10, (erro, senhaCripto) => {
+            if (erro) return res.status(500).json({ msg: "Erro ao criptografar a senha." });
+
+            const updateSql = "UPDATE cliente SET senha = ? WHERE email = ?";
+            con.query(updateSql, [senhaCripto, email], (updateErr) => {
+                if (updateErr) return res.status(500).json({ msg: "Erro ao atualizar a senha." });
+
+                res.status(200).json({ msg: `Sua nova senha é: ${novaSenha}` });
+            });
+        });
+    });
+});
+
+
 
 
 // produtos -------------------------------
