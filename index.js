@@ -1,4 +1,4 @@
-J//importar a biblioteca do node modules chamada "EXPRESS" para criar nosso servidor de backend
+//importar a biblioteca do node modules chamada "EXPRESS" para criar nosso servidor de backend
 const express = require("express");
 
 //importar a biblioteca do MYSQL
@@ -65,7 +65,7 @@ app.post("/cadastrar",(req,res)=>{
         if (error) {
             return res.status(500).send({erro:`Erro ao tentar cadastrar ${error}`})
         }
-        res.status(201).send({msg:`Cliente cadastrado`,payload:result});
+        res.redirect('http://127.0.0.1:5500/index.html');
     })
 })
 
@@ -147,7 +147,7 @@ app.post("/recuperar-senha", (req, res) => {
             con.query(updateSql, [senhaCripto, email], (updateErr) => {
                 if (updateErr) return res.status(500).json({ msg: "Erro ao atualizar a senha." });
 
-                res.status(200).json({ msg: `Sua nova senha é: ${novaSenha}` });
+                res.status(200).json({ msg:`Senha enviada para o seu E-mail}`});
             });
         });
     });
